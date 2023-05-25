@@ -1,0 +1,111 @@
+const Book = require("../models/Book.js");
+const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
+
+const bookController = {};
+
+// Create a new book
+bookController.createBook = catchAsync(async (req, res, next) => {
+  if (Array.isArray(req.body)) {
+    const booksData = req.body;
+
+    const createdBooks = [];
+
+    for (const bookData of booksData) {
+      const { name, author, price, publicationDate } = bookData;
+
+      // Create a new book
+      const book = await Book.create({
+        name,
+        author,
+        price,
+        publicationDate,
+      });
+
+      // Add the created book to the array
+      createdBooks.push(book);
+    }
+
+    // Send the response with the created books
+    sendResponse(
+      res,
+      201,
+      true,
+      createdBooks,
+      null,
+      "Books created successfully"
+    );
+  } else {
+    const { name, author, price, publicationDate } = req.body;
+
+    // Create a new book
+    const book = await Book.create({
+      name,
+      author,
+      price,
+      publicationDate,
+    });
+
+    // Send the response with the created book
+    sendResponse(res, 201, true, book, null, "Book created successfully");
+  }
+});
+
+// Get all books
+bookController.getAllBooks = catchAsync(async (req, res, next) => {
+  // Fetch all books from the database
+  const books = await Book.find({ isDeleted: false });
+
+  sendResponse(res, 200, true, books, null, "Books retrieved successfully");
+});
+
+// Get a book by ID
+bookController.getBookById = catchAsync(async (req, res, next) => {
+  const bookId = req.params.id;
+
+  // Find the book by ID
+  const book = await Book.findOne({ _id: bookId, isDeleted: false });
+
+  if (!book) {
+    throw new AppError(404, "Book not found", "Get Book Error");
+  }
+
+  sendResponse(res, 200, true, book, null, "Book retrieved successfully");
+});
+
+// Update a book by ID
+bookController.updateBook = catchAsync(async (req, res, next) => {
+  const bookId = req.params.id;
+  const updateData = req.body;
+
+  // Find the book by ID and update its data
+  const book = await Book.findByIdAndUpdate(
+    bookId,
+    { $set: { isDeleted: false, updateData } },
+    { new: true }
+  );
+  if (!book) {
+    throw new AppError(404, "Book not found", "Update Book Error");
+  }
+
+  sendResponse(res, 200, true, book, null, "Book updated successfully");
+});
+
+// Delete a book by ID
+bookController.deleteBook = catchAsync(async (req, res, next) => {
+  const bookId = req.params.id;
+
+  // Find the book by ID
+  const book = await Book.findOne({ _id: bookId, isDeleted: false });
+
+  if (!book) {
+    throw new AppError(404, "Book not found", "Delete Book Error");
+  }
+
+  // Mark the book as deleted
+  book.isDeleted = true;
+  await book.save();
+
+  sendResponse(res, 200, true, null, null, "Book deleted successfully");
+});
+
+module.exports = bookController;
