@@ -6,22 +6,10 @@ const cartSchema = new Schema({
     type: Schema.Types.ObjectId,
     required: true,
   },
-  books: [
-    {
-      bookId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-    },
-  ],
+  books: {
+    type: [Schema.Types.Mixed],
+    default: [],
+  },
   isDeleted: {
     type: Boolean,
     default: false,

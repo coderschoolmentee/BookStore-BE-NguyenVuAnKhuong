@@ -41,6 +41,11 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
+    role: {
+      type: String,
+      enum: ["admin", "customer"],
+      default: "customer",
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -55,6 +60,7 @@ userSchema.methods.toJSON = function () {
   const user = this._doc;
   delete user.password;
   delete user.isDeleted;
+  delete user.role;
   return user;
 };
 

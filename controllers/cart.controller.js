@@ -3,18 +3,58 @@ const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 
 const cartController = {};
 
-// Create a new cart
-cartController.addToCart = catchAsync(async (req, res, next) => {
-  const { userId, books } = req.body;
+cartController.updateCart = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const { bookId, quantity, price } = req.body;
 
-  const cart = new Cart({
-    userId,
-    books,
-  });
+  if (!bookId) {
+    return sendResponse(
+      res,
+      400,
+      false,
+      null,
+      "Book ID is required",
+      "Cart update failed"
+    );
+  }
 
-  const savedCart = await cart.save();
+  let cart = await Cart.findOne({ userId });
 
-  sendResponse(res, 200, true, savedCart, null, "Cart created successfully");
+  if (!cart) {
+    // If the cart doesn't exist, create a new cart
+    cart = new Cart({
+      userId,
+      books: [{ bookId, quantity: parseInt(quantity), price: parseInt(price) }],
+    });
+  } else {
+    // Check if the book already exists in the cart
+    const existingBookIndex = cart.books.findIndex(
+      (book) => book.bookId && book.bookId.toString() === bookId
+    );
+    if (existingBookIndex === -1) {
+      // If the book doesn't exist, add it to the cart
+      cart.books.push({
+        bookId,
+        quantity: parseInt(quantity),
+        price: parseInt(price),
+      });
+    } else {
+      // If the book already exists, update the quantity and price
+      cart.books[existingBookIndex].quantity = parseInt(quantity);
+      cart.books[existingBookIndex].price = parseInt(price);
+    }
+  }
+
+  await cart.save();
+
+  return sendResponse(
+    res,
+    200,
+    true,
+    cart.books,
+    null,
+    "Cart updated successfully"
+  );
 });
 
 module.exports = cartController;

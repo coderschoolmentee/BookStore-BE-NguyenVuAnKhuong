@@ -2,6 +2,7 @@ const User = require(`../models/User.js`);
 const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 const bcrypt = require("bcryptjs");
 const authController = {};
+
 authController.loginWithEmail = catchAsync(async (req, res, next) => {
   // get data from request
 
@@ -17,4 +18,5 @@ authController.loginWithEmail = catchAsync(async (req, res, next) => {
   const accessToken = await user.generateToken();
   sendResponse(res, 200, true, { user, accessToken }, null, "Login successful");
 });
+
 module.exports = authController;

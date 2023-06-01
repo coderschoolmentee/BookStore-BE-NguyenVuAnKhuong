@@ -1,6 +1,6 @@
 const Book = require("../models/Book.js");
 const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
-
+const { default: mongoose } = require("mongoose");
 const bookController = {};
 
 // Create a new book
@@ -49,21 +49,106 @@ bookController.createBook = catchAsync(async (req, res, next) => {
     sendResponse(res, 201, true, book, null, "Book created successfully");
   }
 });
-
-// Get all books
 bookController.getAllBooks = catchAsync(async (req, res, next) => {
   // Fetch all books from the database
-  const books = await Book.find({ isDeleted: false });
+
+  const books = await Book.aggregate([
+    {
+      $match: { isDeleted: false },
+    },
+    {
+      $lookup: {
+        from: "bookcategories",
+        let: { bookId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$$bookId", "$bookId"] },
+            },
+          },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "categoryId",
+              foreignField: "_id",
+              as: "category",
+            },
+          },
+          {
+            $unwind: "$category",
+          },
+          {
+            $project: {
+              _id: 0,
+              categoryName: "$category.categoryName",
+            },
+          },
+        ],
+        as: "categories",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        author: 1,
+        price: 1,
+        publicationDate: 1,
+        categories: "$categories.categoryName",
+      },
+    },
+  ]);
 
   sendResponse(res, 200, true, books, null, "Books retrieved successfully");
 });
-
-// Get a book by ID
 bookController.getBookById = catchAsync(async (req, res, next) => {
   const bookId = req.params.id;
 
-  // Find the book by ID
-  const book = await Book.findOne({ _id: bookId, isDeleted: false });
+  const [book] = await Book.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(bookId), isDeleted: false },
+    },
+    {
+      $lookup: {
+        from: "bookcategories",
+        let: { bookId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$$bookId", "$bookId"] },
+              isDelete: false,
+            },
+          },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "categoryId",
+              foreignField: "_id",
+              as: "category",
+            },
+          },
+          {
+            $unwind: "$category",
+          },
+          {
+            $project: {
+              _id: 0,
+              categoryName: "$category.categoryName",
+            },
+          },
+        ],
+        as: "categories",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        author: 1,
+        price: 1,
+        publicationDate: 1,
+        categories: "$categories.categoryName",
+      },
+    },
+  ]);
 
   if (!book) {
     throw new AppError(404, "Book not found", "Get Book Error");
@@ -86,7 +171,6 @@ bookController.updateBook = catchAsync(async (req, res, next) => {
   if (!book) {
     throw new AppError(404, "Book not found", "Update Book Error");
   }
-
   sendResponse(res, 200, true, book, null, "Book updated successfully");
 });
 

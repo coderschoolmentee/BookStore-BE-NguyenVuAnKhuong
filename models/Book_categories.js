@@ -12,7 +12,16 @@ const bookCategoriesSchema = new Schema({
     ref: "Book",
     required: true,
   },
+  isDelete: {
+    type: Boolean,
+    default: false,
+  },
 });
+bookCategoriesSchema.methods.toJSON = function () {
+  const bookCategories = this._doc;
+  delete bookCategories.isDeleted;
+  return bookCategories;
+};
 
 const BookCategory = mongoose.model("BookCategory", bookCategoriesSchema);
 

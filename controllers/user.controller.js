@@ -1,4 +1,5 @@
 const User = require(`../models/User.js`);
+const Cart = require(`../models/Cart.js`);
 const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 const bcrypt = require("bcryptjs");
 
@@ -12,6 +13,7 @@ userController.register = catchAsync(async (req, res, next) => {
   // validation
 
   let user = await User.findOne({ email });
+
   if (user)
     throw new AppError(400, "User allready exists", "Registration Error");
 
@@ -19,18 +21,14 @@ userController.register = catchAsync(async (req, res, next) => {
 
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
+  //Create user
   user = await User.create({ name, email, password });
-  const accessToken = await user.generateToken();
+  //Create cart
+  const cart = await Cart.create({ userId: user._id, books: [] });
+  // const accessToken = await user.generateToken();
   // response
 
-  sendResponse(
-    res,
-    200,
-    true,
-    { user, accessToken },
-    null,
-    "Create user successful"
-  );
+  sendResponse(res, 200, true, user, null, "Create user successful");
 });
 
 userController.getUserById = catchAsync(async (req, res, next) => {

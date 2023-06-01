@@ -20,7 +20,7 @@ router.use("/books", bookApi);
 router.use("/categories", categoryApi);
 router.use("/reviews", reviewApi);
 router.use("/carts", cartApi);
-// router.use("/bookCategory", bookCategoryApi);
-// router.use("/orders", orderApi);
+router.use("/bookCategory", bookCategoryApi);
+router.use("/orders", orderApi);
 
 module.exports = router;
