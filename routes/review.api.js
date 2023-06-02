@@ -6,12 +6,12 @@ const reviewController = require("../controllers/review.controller");
 router.post("/:id", reviewController.createReview);
 
 // Get all review by userId
-router.get("/", reviewController.getReview);
+router.get("/:id", reviewController.getReview);
 
-// Route for updating a review
+// update a review
 router.put("/:id", reviewController.updateReview);
 
-// Route for deleting a review
+// delete a review
 router.delete("/:id", reviewController.deleteReview);
 
 module.exports = router;

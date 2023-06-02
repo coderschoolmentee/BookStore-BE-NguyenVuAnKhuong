@@ -28,7 +28,8 @@ reviewController.createReview = catchAsync(async (req, res, next) => {
 
 // Route for getting all review
 reviewController.getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.find({ isDeleted: false });
+  const { id } = req.params;
+  const review = await Review.find({ userId: id, isDeleted: false });
 
   if (!review) {
     throw new AppError(404, "Can not get Review", "Review Error");

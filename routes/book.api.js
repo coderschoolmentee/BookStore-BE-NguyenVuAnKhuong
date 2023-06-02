@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/book.controller");
 const authorize = require("../middlewares/authorization");
-const authController = require("../controllers/auth.controller");
 
 // Create a new book
 router.post("/", authorize(["admin"]), bookController.createBook);

@@ -84,9 +84,12 @@ bookCategoryController.errorHandler = (err, req, res, next) => {
 
 // DELETE a book category by ID
 bookCategoryController.deleteBookCategory = catchAsync(async (req, res) => {
-  const { categoryId, bookId } = req.body;
+  const { bookcategoryId } = req.params;
 
-  const bookCategory = await BookCategory.findOne({ categoryId, bookId });
+  const bookCategory = await BookCategory.findOne({
+    bookcategoryId,
+    isDeleted: false,
+  });
 
   if (!bookCategory) {
     return sendResponse(
@@ -96,18 +99,6 @@ bookCategoryController.deleteBookCategory = catchAsync(async (req, res) => {
       null,
       "Book category not found",
       "Delete failed"
-    );
-  }
-
-  // Check if the book category is already deleted
-  if (bookCategory.isDeleted) {
-    return sendResponse(
-      res,
-      400,
-      false,
-      null,
-      "Book category is already deleted",
-      "Delete operation failed"
     );
   }
 
