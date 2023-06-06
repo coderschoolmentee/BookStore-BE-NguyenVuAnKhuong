@@ -1,4 +1,5 @@
 const Book = require("../models/Book.js");
+const Review = require("../models/Review.js");
 const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 const { default: mongoose } = require("mongoose");
 const bookController = {};
@@ -50,8 +51,17 @@ bookController.createBook = catchAsync(async (req, res, next) => {
   }
 });
 bookController.getAllBooks = catchAsync(async (req, res, next) => {
-  // Fetch all books from the database
+  // Extract page and limit from the query parameters
+  const { page = 1, limit = 10 } = req.query;
 
+  // Convert page and limit to numbers
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+
+  // Calculate the skip value based on the page and limit
+  const skip = (pageNumber - 1) * limitNumber;
+
+  // Fetch paginated books from the database
   const books = await Book.aggregate([
     {
       $match: { isDeleted: false },
@@ -96,10 +106,17 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
         categories: "$categories.categoryName",
       },
     },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limitNumber,
+    },
   ]);
 
   sendResponse(res, 200, true, books, null, "Books retrieved successfully");
 });
+
 bookController.getBookById = catchAsync(async (req, res, next) => {
   const bookId = req.params.id;
 
@@ -153,6 +170,11 @@ bookController.getBookById = catchAsync(async (req, res, next) => {
   if (!book) {
     throw new AppError(404, "Book not found", "Get Book Error");
   }
+
+  const reviews = await Review.find({ bookId: book._id, isDeleted: false });
+
+  // You can now include the `reviews` array in the `book` object
+  book.reviews = reviews;
 
   sendResponse(res, 200, true, book, null, "Book retrieved successfully");
 });

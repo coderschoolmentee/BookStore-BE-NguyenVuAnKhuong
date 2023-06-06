@@ -19,6 +19,10 @@ const bookSchema = new Schema(
       type: Number,
       required: true,
     },
+    img: {
+      type: String,
+      default: "",
+    },
     isDeleted: {
       type: Boolean,
       default: false,
