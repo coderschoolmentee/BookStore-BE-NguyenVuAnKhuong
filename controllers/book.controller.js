@@ -50,9 +50,10 @@ bookController.createBook = catchAsync(async (req, res, next) => {
     sendResponse(res, 201, true, book, null, "Book created successfully");
   }
 });
+
 bookController.getAllBooks = catchAsync(async (req, res, next) => {
-  // Extract page and limit from the query parameters
-  const { page = 1, limit = 10 } = req.query;
+  // Extract page, limit, and search query from the query parameters
+  const { page = 1, limit = 10, search } = req.query;
 
   // Convert page and limit to numbers
   const pageNumber = parseInt(page);
@@ -61,10 +62,20 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
   // Calculate the skip value based on the page and limit
   const skip = (pageNumber - 1) * limitNumber;
 
-  // Fetch paginated books from the database
+  // Create a search query object
+  const searchQuery = {};
+  if (search) {
+    // Add a case-insensitive search for the book name
+    searchQuery.name = { $regex: new RegExp(search, "i") };
+  }
+
+  // Fetch paginated books from the database with search query
   const books = await Book.aggregate([
     {
-      $match: { isDeleted: false },
+      $match: {
+        isDeleted: false,
+        ...searchQuery, // Merge the search query with other conditions
+      },
     },
     {
       $lookup: {
