@@ -63,19 +63,21 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
   const skip = (pageNumber - 1) * limitNumber;
 
   // Create a search query object
-  const searchQuery = {};
+  const searchQuery = {
+    isDeleted: false,
+  };
+
   if (search) {
-    // Add a case-insensitive search for the book name
-    searchQuery.name = { $regex: new RegExp(search, "i") };
+    searchQuery.$or = [
+      { name: { $regex: new RegExp(search, "i") } }, // Search by book name
+      { categories: { $regex: new RegExp(search, "i") } }, // Search by category name
+    ];
   }
 
   // Fetch paginated books from the database with search query
   const books = await Book.aggregate([
     {
-      $match: {
-        isDeleted: false,
-        ...searchQuery, // Merge the search query with other conditions
-      },
+      $match: searchQuery,
     },
     {
       $lookup: {

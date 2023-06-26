@@ -1,4 +1,6 @@
 const Category = require("../models/Category");
+const Book = require("../models/Book");
+const BookCategory = require("../models/Book_categories");
 const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 
 const categoryController = {};
@@ -71,14 +73,31 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
     throw new AppError(404, "Category not found", "Category Error");
   }
 
-  // Send the response with the category
+  // Find all books associated with the category using the BookCategory model
+  const bookCategory = await BookCategory.find({
+    categoryId: category._id,
+  });
+
+  // Retrieve the book IDs from the bookCategory
+  const bookIds = bookCategory.map((item) => item.bookId);
+
+  // Fetch the books using the Book model
+  const books = await Book.find({ _id: { $in: bookIds }, isDeleted: false });
+
+  // Create a response object containing both category and books information
+  const response = {
+    category,
+    books,
+  };
+
+  // Send the response with the category and books
   sendResponse(
     res,
     200,
     true,
-    category,
+    response,
     null,
-    "Category retrieved successfully"
+    "Category and books retrieved successfully"
   );
 });
 
