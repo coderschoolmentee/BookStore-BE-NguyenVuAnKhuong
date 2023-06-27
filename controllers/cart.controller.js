@@ -3,6 +3,24 @@ const { sendResponse, catchAsync, AppError } = require("../helpers/utils");
 
 const cartController = {};
 
+cartController.getCart = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+
+  const cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    throw new AppError("Cart not found", 404);
+  }
+
+  return sendResponse(
+    res,
+    200,
+    true,
+    cart.books,
+    null,
+    "Cart retrieved successfully"
+  );
+});
 cartController.updateCart = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const { bookId, quantity, price } = req.body;
