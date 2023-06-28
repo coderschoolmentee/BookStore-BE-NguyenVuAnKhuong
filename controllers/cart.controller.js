@@ -21,9 +21,12 @@ cartController.getCart = catchAsync(async (req, res) => {
     "Cart retrieved successfully"
   );
 });
+
 cartController.updateCart = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const { bookId, quantity, price } = req.body;
+
+  console.log("Request:", req.body);
 
   if (!bookId) {
     return sendResponse(
@@ -37,42 +40,35 @@ cartController.updateCart = catchAsync(async (req, res) => {
   }
 
   let cart = await Cart.findOne({ userId });
-
+  console.log(cart.books);
   if (!cart) {
-    // If the cart doesn't exist, create a new cart
+    console.log("Creating new cart...");
+
     cart = new Cart({
       userId,
-      books: [{ bookId, quantity: parseInt(quantity), price: parseInt(price) }],
+      books: [
+        { bookId, quantity: parseInt(quantity), price: parseFloat(price) },
+      ],
     });
   } else {
-    // Check if the book already exists in the cart
-    const existingBookIndex = cart.books.findIndex(
-      (book) => book.bookId && book.bookId.toString() === bookId
-    );
-    if (existingBookIndex === -1) {
-      // If the book doesn't exist, add it to the cart
-      cart.books.push({
-        bookId,
-        quantity: parseInt(quantity),
-        price: parseInt(price),
-      });
-    } else {
-      // If the book already exists, update the quantity and price
-      cart.books[existingBookIndex].quantity = parseInt(quantity);
-      cart.books[existingBookIndex].price = parseInt(price);
-    }
+    console.log("Updating existing cart...");
+
+    cart.books = cart.books.map((book) => {
+      if (book.bookId === bookId) {
+        return {
+          ...book,
+          quantity: parseInt(quantity),
+          price: parseFloat(price),
+        };
+      }
+      return book;
+    });
+
+    await cart.save();
   }
 
-  await cart.save();
-
-  return sendResponse(
-    res,
-    200,
-    true,
-    cart.books,
-    null,
-    "Cart updated successfully"
-  );
+  // Return the entire updated cart object
+  return sendResponse(res, 200, true, null, null, "Cart updated successfully");
 });
 
 module.exports = cartController;
