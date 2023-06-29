@@ -53,11 +53,14 @@ cartController.updateCart = catchAsync(async (req, res) => {
   } else {
     console.log("Updating existing cart...");
 
+    let bookExists = false;
+
     cart.books = cart.books.map((book) => {
       if (book.bookId === bookId) {
         if (parseInt(quantity) === 0) {
           return null; // Remove the book from the array
         } else {
+          bookExists = true;
           return {
             ...book,
             quantity: parseInt(quantity),
@@ -70,6 +73,15 @@ cartController.updateCart = catchAsync(async (req, res) => {
 
     // Filter out any null entries (books with quantity zero) from the array
     cart.books = cart.books.filter((book) => book !== null);
+
+    if (!bookExists && parseInt(quantity) > 0) {
+      // Add a new book entry to the cart
+      cart.books.push({
+        bookId,
+        quantity: parseInt(quantity),
+        price: parseFloat(price),
+      });
+    }
 
     await cart.save();
   }
