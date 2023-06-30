@@ -6,11 +6,12 @@ const reviewController = {};
 // Create a new review
 reviewController.createReview = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { bookId, comment } = req.body;
+  const { bookId, comment, name } = req.body;
 
   const review = new Review({
     bookId,
     userId: id,
+    name,
     comment,
   });
 

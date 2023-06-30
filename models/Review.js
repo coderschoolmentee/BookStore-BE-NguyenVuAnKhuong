@@ -13,6 +13,10 @@ const reviewSchema = new Schema(
       ref: "User",
       required: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     comment: {
       type: String,
       required: true,
