@@ -75,7 +75,7 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
   }
 
   // Fetch paginated books from the database with search query
-  const books = await Book.aggregate([
+  const result = await Book.aggregate([
     {
       $match: searchQuery,
     },
@@ -121,14 +121,23 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
       },
     },
     {
-      $skip: skip,
-    },
-    {
-      $limit: limitNumber,
+      $facet: {
+        paginatedBooks: [{ $skip: skip }, { $limit: limitNumber }],
+        totalCount: [{ $count: "total" }],
+      },
     },
   ]);
 
-  sendResponse(res, 200, true, books, null, "Books retrieved successfully");
+  const { paginatedBooks, totalCount } = result[0];
+
+  const totalPages = Math.ceil(totalCount[0].total / limitNumber);
+
+  const response = {
+    books: paginatedBooks,
+    totalPages,
+  };
+
+  sendResponse(res, 200, true, response, null, "Books retrieved successfully");
 });
 
 bookController.getBookById = catchAsync(async (req, res, next) => {
