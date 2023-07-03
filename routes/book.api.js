@@ -13,7 +13,7 @@ router.get("/", bookController.getAllBooks);
 router.get("/:id", bookController.getBookById);
 
 // Update a book by ID
-router.put("/:id", authorize(["admin"]), bookController.updateBook);
+router.put("/:id", bookController.updateBook);
 
 // Delete a book by ID
 router.delete("/:id", authorize(["admin"]), bookController.deleteBook);

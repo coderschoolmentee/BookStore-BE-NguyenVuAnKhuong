@@ -200,7 +200,7 @@ bookController.updateBook = catchAsync(async (req, res, next) => {
   // Find the book by ID and update its data
   const book = await Book.findByIdAndUpdate(
     bookId,
-    { $set: { isDeleted: false, updateData } },
+    { $set: { isDeleted: false, ...updateData } },
     { new: true }
   );
   if (!book) {
