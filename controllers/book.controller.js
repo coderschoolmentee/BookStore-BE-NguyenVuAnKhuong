@@ -130,7 +130,10 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
 
   const { paginatedBooks, totalCount } = result[0];
 
-  const totalPages = Math.ceil(totalCount[0].total / limitNumber);
+  const totalPages =
+    paginatedBooks.length > 0
+      ? Math.ceil(totalCount[0].total / limitNumber)
+      : 0;
 
   const response = {
     books: paginatedBooks,
