@@ -25,7 +25,7 @@ userController.register = catchAsync(async (req, res, next) => {
   user = await User.create({ name, email, password });
   //Create cart
   const cart = await Cart.create({ userId: user._id, books: [] });
-  // const accessToken = await user.generateToken();
+  const accessToken = await user.generateToken();
   // response
 
   sendResponse(res, 200, true, user, null, "Create user successful");
