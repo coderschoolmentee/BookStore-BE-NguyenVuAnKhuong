@@ -22,8 +22,8 @@ const userSchema = new Schema(
       default: "",
     },
     birthday: {
-      type: Number,
-      default: 30041975,
+      type: String,
+      default: "30041975",
     },
     address: {
       type: String,
