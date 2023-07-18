@@ -28,7 +28,14 @@ userController.register = catchAsync(async (req, res, next) => {
   const accessToken = await user.generateToken();
   // response
 
-  sendResponse(res, 200, true, user, null, "Create user successful");
+  sendResponse(
+    res,
+    200,
+    true,
+    { user, accessToken },
+    null,
+    "Create user successful"
+  );
 });
 
 userController.getCurrentUser = catchAsync(async (req, res, next) => {
