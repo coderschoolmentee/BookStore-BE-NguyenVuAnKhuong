@@ -73,8 +73,15 @@ orderController.getOrder = catchAsync(async (req, res, next) => {
 orderController.getAllOrder = catchAsync(async (req, res, next) => {
   const userId = req.params.userId;
 
-  // Fetch all orders for the user
   const orders = await Order.find({ userId });
+
+  for (const order of orders) {
+    for (const book of order.books) {
+      const foundBook = await Book.findById(book.bookId);
+      book.name = foundBook.name;
+    }
+  }
+
   sendResponse(res, 200, true, orders, null, "Orders retrieved successfully");
 });
 
