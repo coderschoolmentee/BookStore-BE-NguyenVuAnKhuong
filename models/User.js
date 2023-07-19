@@ -18,7 +18,6 @@ const userSchema = new Schema(
     },
     gender: {
       type: String,
-      emun: ["male", "female"],
       default: "",
     },
     birthday: {
