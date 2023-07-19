@@ -73,7 +73,7 @@ userController.updateUser = catchAsync(async (req, res, next) => {
     name,
     email,
     password,
-    sex,
+    gender,
     birthday,
     address,
     city,
@@ -92,7 +92,7 @@ userController.updateUser = catchAsync(async (req, res, next) => {
 
   user.name = name || user.name;
   user.email = email || user.email;
-  user.sex = sex || user.sex;
+  user.gender = gender || user.gender;
   user.birthday = birthday || user.birthday;
   user.address = address || user.address;
   user.city = city || user.city;
