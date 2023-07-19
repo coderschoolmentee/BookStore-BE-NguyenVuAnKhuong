@@ -82,7 +82,7 @@ userController.updateUser = catchAsync(async (req, res, next) => {
   } = req.body;
 
   // Fetch user from the database
-  const user = await User.findOne({ _id: userId, isDeleted: false });
+  let user = await User.findOne({ _id: userId, isDeleted: false });
 
   if (!user) {
     throw new AppError(404, "User not found", "Profile Update Error");
