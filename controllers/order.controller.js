@@ -33,11 +33,12 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
     }
 
     // Calculate the total price for the book
+    const name = book.name;
     const price = book.price;
     const total = quantity * price;
 
     // Add the book to the ordered books array
-    orderedBooks.push({ bookId, quantity, price, total });
+    orderedBooks.push({ bookId, name, quantity, price, total });
   }
 
   // Calculate the total amount for the order
