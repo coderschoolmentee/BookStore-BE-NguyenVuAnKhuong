@@ -15,6 +15,6 @@ router.get("/:userId", orderController.getAllOrder);
 router.get("/:userId/:orderId", orderController.getOrderById);
 
 //Cancer a order
-router.delete("/:userId/:orderId", orderController.updateOrder);
+router.put("/:userId/:orderId", orderController.updateOrder);
 
 module.exports = router;
