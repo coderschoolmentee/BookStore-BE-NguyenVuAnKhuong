@@ -14,6 +14,10 @@ const orderSchema = new Schema(
           type: Schema.Types.ObjectId,
           required: true,
         },
+        name: {
+          type: String,
+          required: true,
+        },
         quantity: {
           type: Number,
           required: true,
