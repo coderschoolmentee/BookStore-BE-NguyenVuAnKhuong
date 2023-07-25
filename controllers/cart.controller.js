@@ -58,7 +58,7 @@ cartController.updateCart = catchAsync(async (req, res) => {
     cart.books = cart.books.map((book) => {
       if (book.bookId === bookId) {
         if (parseInt(quantity) === 0) {
-          return null; // Remove the book from the array
+          return null;
         } else {
           bookExists = true;
           return {
@@ -71,11 +71,9 @@ cartController.updateCart = catchAsync(async (req, res) => {
       return book;
     });
 
-    // Filter out any null entries (books with quantity zero) from the array
     cart.books = cart.books.filter((book) => book !== null);
 
     if (!bookExists && parseInt(quantity) > 0) {
-      // Add a new book entry to the cart
       cart.books.push({
         bookId,
         quantity: parseInt(quantity),
@@ -86,7 +84,6 @@ cartController.updateCart = catchAsync(async (req, res) => {
     await cart.save();
   }
 
-  // Return the entire updated cart object
   return sendResponse(res, 200, true, null, null, "Cart updated successfully");
 });
 

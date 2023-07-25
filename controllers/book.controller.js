@@ -14,7 +14,6 @@ bookController.createBook = catchAsync(async (req, res, next) => {
     for (const bookData of booksData) {
       const { name, author, price, publicationDate } = bookData;
 
-      // Create a new book
       const book = await Book.create({
         name,
         author,
@@ -22,11 +21,9 @@ bookController.createBook = catchAsync(async (req, res, next) => {
         publicationDate,
       });
 
-      // Add the created book to the array
       createdBooks.push(book);
     }
 
-    // Send the response with the created books
     sendResponse(
       res,
       201,
@@ -38,7 +35,6 @@ bookController.createBook = catchAsync(async (req, res, next) => {
   } else {
     const { name, author, price, publicationDate } = req.body;
 
-    // Create a new book
     const book = await Book.create({
       name,
       author,
@@ -46,35 +42,29 @@ bookController.createBook = catchAsync(async (req, res, next) => {
       publicationDate,
     });
 
-    // Send the response with the created book
     sendResponse(res, 201, true, book, null, "Book created successfully");
   }
 });
 
 bookController.getAllBooks = catchAsync(async (req, res, next) => {
-  // Extract page, limit, and search query from the query parameters
   const { page = 1, limit = 10, search } = req.query;
 
-  // Convert page and limit to numbers
   const pageNumber = parseInt(page);
   const limitNumber = parseInt(limit);
 
-  // Calculate the skip value based on the page and limit
   const skip = (pageNumber - 1) * limitNumber;
 
-  // Create a search query object
   const searchQuery = {
     isDeleted: false,
   };
 
   if (search) {
     searchQuery.$or = [
-      { name: { $regex: new RegExp(search, "i") } }, // Search by book name
-      { categories: { $regex: new RegExp(search, "i") } }, // Search by category name
+      { name: { $regex: new RegExp(search, "i") } },
+      { categories: { $regex: new RegExp(search, "i") } },
     ];
   }
 
-  // Fetch paginated books from the database with search query
   const result = await Book.aggregate([
     {
       $match: searchQuery,
@@ -200,18 +190,15 @@ bookController.getBookById = catchAsync(async (req, res, next) => {
 
   const reviews = await Review.find({ bookId: book._id, isDeleted: false });
 
-  // You can now include the `reviews` array in the `book` object
   book.reviews = reviews;
 
   sendResponse(res, 200, true, book, null, "Book retrieved successfully");
 });
 
-// Update a book by ID
 bookController.updateBook = catchAsync(async (req, res, next) => {
   const bookId = req.params.id;
   const updateData = req.body;
 
-  // Find the book by ID and update its data
   const book = await Book.findByIdAndUpdate(
     bookId,
     { $set: { isDeleted: false, ...updateData } },
@@ -223,18 +210,15 @@ bookController.updateBook = catchAsync(async (req, res, next) => {
   sendResponse(res, 200, true, book, null, "Book updated successfully");
 });
 
-// Delete a book by ID
 bookController.deleteBook = catchAsync(async (req, res, next) => {
   const bookId = req.params.id;
 
-  // Find the book by ID
   const book = await Book.findOne({ _id: bookId, isDeleted: false });
 
   if (!book) {
     throw new AppError(404, "Book not found", "Delete Book Error");
   }
 
-  // Mark the book as deleted
   book.isDeleted = true;
   await book.save();
 

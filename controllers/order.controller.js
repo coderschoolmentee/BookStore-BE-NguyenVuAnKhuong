@@ -9,19 +9,15 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
   const { books, shippingAddress } = req.body;
 
-  // Fetch the user
   const user = await User.findById(userId);
 
   if (!user) {
     throw new AppError(404, "User not found", "Create Order Error");
   }
 
-  // Create an array to store the books in the order
   const orderedBooks = [];
 
-  // Loop through the books in the request
   for (const { bookId, quantity } of books) {
-    // Find the book
     const book = await Book.findById(bookId);
 
     if (!book) {
@@ -32,22 +28,18 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
       );
     }
 
-    // Calculate the total price for the book
     const name = book.name;
     const price = book.price;
     const total = quantity * price;
 
-    // Add the book to the ordered books array
     orderedBooks.push({ bookId, name, quantity, price, total });
   }
 
-  // Calculate the total amount for the order
   const totalAmount = orderedBooks.reduce(
     (total, { total: bookTotal }) => total + bookTotal,
     0
   );
 
-  // Create the order
   const order = await Order.create({
     userId,
     books: orderedBooks,
@@ -56,7 +48,6 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
     shippingAddress,
   });
 
-  // Delete the ordered books from the cart
   const bookIds = orderedBooks.map(({ bookId }) => bookId);
   await Cart.updateOne(
     { userId },
@@ -89,7 +80,6 @@ orderController.getAllOrder = catchAsync(async (req, res, next) => {
 orderController.getOrderById = catchAsync(async (req, res, next) => {
   const { userId, orderId } = req.params;
 
-  // Find the order by user ID and order ID
   const order = await Order.findOne({ userId, _id: orderId });
 
   if (!order) {
@@ -102,20 +92,18 @@ orderController.getOrderById = catchAsync(async (req, res, next) => {
 orderController.updateOrder = catchAsync(async (req, res, next) => {
   const { userId, orderId } = req.params;
   const { status } = req.body;
-  // Find the order by user ID and order ID
+
   const order = await Order.findOne({ userId, _id: orderId });
 
   if (!order) {
     throw new AppError(404, "Order not found", "Order Error");
   }
 
-  // If the order is already cancelled, return the order as it is
   if (order.status === "Cancelled") {
     sendResponse(res, 200, true, null, null, "Order is already cancelled");
     return;
   }
 
-  // Update the order status to "Cancelled"
   order.status = status;
   await order.save();
 
