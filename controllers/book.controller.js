@@ -12,13 +12,14 @@ bookController.createBook = catchAsync(async (req, res, next) => {
     const createdBooks = [];
 
     for (const bookData of booksData) {
-      const { name, author, price, publicationDate } = bookData;
+      const { name, author, price, publicationDate, img } = bookData;
 
       const book = await Book.create({
         name,
         author,
         price,
         publicationDate,
+        img,
       });
 
       createdBooks.push(book);
@@ -33,13 +34,14 @@ bookController.createBook = catchAsync(async (req, res, next) => {
       "Books created successfully"
     );
   } else {
-    const { name, author, price, publicationDate } = req.body;
+    const { name, author, price, publicationDate, img } = req.body;
 
     const book = await Book.create({
       name,
       author,
       price,
       publicationDate,
+      img,
     });
 
     sendResponse(res, 201, true, book, null, "Book created successfully");
