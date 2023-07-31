@@ -70,10 +70,9 @@ orderController.getAllOrder = catchAsync(async (req, res, next) => {
   for (const order of orders) {
     for (const book of order.books) {
       const foundBook = await Book.findById(book.bookId);
-      book.name = foundBook.name;
+      if (foundBook) book.name = foundBook.name;
     }
   }
-
   sendResponse(res, 200, true, orders, null, "Orders retrieved successfully");
 });
 
