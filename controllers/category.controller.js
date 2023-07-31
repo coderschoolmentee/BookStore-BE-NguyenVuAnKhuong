@@ -58,7 +58,7 @@ categoryController.getAllCategories = catchAsync(async (req, res, next) => {
 
 categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { page = 1, limit = 5 } = req.query;
+  const { page = 1, limit = 5, search = "" } = req.query;
 
   const category = await Category.findOne({ _id: id, isDeleted: false });
 
@@ -66,9 +66,17 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
     throw new AppError(404, "Category not found", "Category Error");
   }
 
-  const bookCategory = await BookCategory.find({
-    categoryId: category._id,
-  });
+  const query = { categoryId: category._id };
+
+  if (search) {
+    query.$or = [
+      { name: { $regex: new RegExp(search, "i") } },
+      { description: { $regex: new RegExp(search, "i") } },
+      { anyOtherTextField: { $regex: new RegExp(search, "i") } },
+    ];
+  }
+
+  const bookCategory = await BookCategory.find(query);
 
   const bookIds = bookCategory.map((item) => item.bookId);
 
