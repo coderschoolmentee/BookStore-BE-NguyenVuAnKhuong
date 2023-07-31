@@ -68,24 +68,27 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
 
   const query = { categoryId: category._id };
 
-  if (search) {
-    query.name = { $regex: new RegExp(search, "i") };
-  }
-
   const bookCategory = await BookCategory.find(query);
-
   const bookIds = bookCategory.map((item) => item.bookId);
 
-  const totalBooks = bookIds.length;
+  let bookQuery = {
+    _id: { $in: bookIds },
+    isDeleted: false,
+  };
+
+  if (search) {
+    bookQuery.name = { $regex: new RegExp(search, "i") };
+  }
+
+  const totalBooks = await Book.countDocuments(bookQuery);
   const totalPages = Math.ceil(totalBooks / limit);
 
   const skipItems = (page - 1) * limit;
-  const paginatedBookIds = bookIds.slice(skipItems, skipItems + limit);
 
-  const books = await Book.find({
-    _id: { $in: paginatedBookIds },
-    isDeleted: false,
-  });
+  const books = await Book.find(bookQuery)
+    .skip(skipItems)
+    .limit(limit)
+    .select("-isDeleted");
 
   const response = {
     category,
