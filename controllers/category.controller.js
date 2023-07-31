@@ -58,7 +58,7 @@ categoryController.getAllCategories = catchAsync(async (req, res, next) => {
 
 categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { page = 1, limit = 5 } = req.body;
+  const { page = 1, limit = 5 } = req.query;
 
   const category = await Category.findOne({ _id: id, isDeleted: false });
 
