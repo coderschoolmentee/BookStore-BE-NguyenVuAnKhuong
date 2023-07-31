@@ -69,11 +69,7 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   const query = { categoryId: category._id };
 
   if (search) {
-    query.$or = [
-      { name: { $regex: new RegExp(search, "i") } },
-      { description: { $regex: new RegExp(search, "i") } },
-      { anyOtherTextField: { $regex: new RegExp(search, "i") } },
-    ];
+    query.name = { $regex: new RegExp(search, "i") };
   }
 
   const bookCategory = await BookCategory.find(query);
