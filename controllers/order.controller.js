@@ -46,7 +46,6 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
     status: "Processing",
     totalAmount,
     shippingAddress,
-    isDeleted: false,
   });
 
   const bookIds = orderedBooks.map(({ bookId }) => bookId);

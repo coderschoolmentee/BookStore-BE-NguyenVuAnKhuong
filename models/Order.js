@@ -30,10 +30,6 @@ const orderSchema = new Schema(
           type: Number,
           required: true,
         },
-        isDeleted: {
-          type: Boolean,
-          default: false,
-        },
       },
     ],
     status: {
@@ -48,6 +44,10 @@ const orderSchema = new Schema(
     shippingAddress: {
       type: String,
       required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
