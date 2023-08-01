@@ -58,18 +58,44 @@ bookCategoryController.createBookCategory = catchAsync(async (req, res) => {
   );
 });
 
-bookCategoryController.errorHandler = (err, req, res, next) => {
-  if (err instanceof AppError) {
-    return sendResponse(
-      res,
-      err.statusCode,
-      false,
-      null,
-      err.message,
-      err.message
-    );
+bookCategoryController.updateBookCategory = catchAsync(async (req, res) => {
+  const { bookId } = req.params;
+  const { categoryIds } = req.body;
+
+  const book = await Book.findById(bookId);
+  if (!book) {
+    throw new AppError("Book not found", 404);
   }
-};
+
+  await BookCategory.deleteMany({ bookId });
+
+  const updatedBookCategories = [];
+
+  for (const categoryId of categoryIds) {
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      throw new AppError("Category not found", 404);
+    }
+
+    const newBookCategory = new BookCategory({
+      categoryId,
+      bookId,
+    });
+
+    const savedBookCategory = await newBookCategory.save();
+
+    updatedBookCategories.push(savedBookCategory);
+  }
+
+  return sendResponse(
+    res,
+    201,
+    true,
+    updatedBookCategories,
+    null,
+    "Book category updated successfully"
+  );
+});
 
 bookCategoryController.deleteBookCategory = catchAsync(async (req, res) => {
   const { bookcategoryId } = req.params;

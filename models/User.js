@@ -59,7 +59,6 @@ userSchema.methods.toJSON = function () {
   const user = this._doc;
   delete user.password;
   delete user.isDeleted;
-  delete user.role;
   return user;
 };
 
