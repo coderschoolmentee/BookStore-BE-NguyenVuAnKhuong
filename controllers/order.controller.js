@@ -136,8 +136,7 @@ orderController.updateOrderAD = catchAsync(async (req, res, next) => {
   }
 
   if (order.status === "Cancelled") {
-    sendResponse(res, 200, true, null, null, "Order is already cancelled");
-    return;
+    throw new AppError(404, "Order is already cancelled", "Order Error");
   }
 
   order.status = status;
