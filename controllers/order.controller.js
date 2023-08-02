@@ -30,7 +30,7 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
 
     const name = book.name;
     const price = book.price;
-    const total = quantity * price;
+    const total = (quantity * price).toFixed(2);
 
     orderedBooks.push({ bookId, name, quantity, price, total });
   }
