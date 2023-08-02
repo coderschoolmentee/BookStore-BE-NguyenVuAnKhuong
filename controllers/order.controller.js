@@ -58,7 +58,7 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
 });
 
 orderController.getOrder = catchAsync(async (req, res, next) => {
-  const orders = await Order.find({});
+  const orders = await Order.find({ isDeleted: false });
   return sendResponse(res, 200, true, orders, "Orders retrieved successfully");
 });
 
