@@ -17,6 +17,9 @@ router.get("/:userId/:orderId", orderController.getOrderById);
 //Cancer a order
 router.put("/:userId/:orderId", orderController.updateOrder);
 
+// Update Order for Admin
+router.put("/:orderId", orderController.updateOrderAD);
+
 //Delete a order
 router.delete("/:userId/:orderId", orderController.deleteOrder);
 

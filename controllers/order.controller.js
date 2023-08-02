@@ -125,4 +125,25 @@ orderController.deleteOrder = catchAsync(async (req, res, next) => {
   sendResponse(res, 200, true, null, null, "Order deleted successfully");
 });
 
+orderController.updateOrderAD = catchAsync(async (req, res, next) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  const order = await Order.findOne({ _id: orderId, isDeleted: false });
+
+  if (!order) {
+    throw new AppError(404, "Order not found", "Order Error");
+  }
+
+  if (order.status === "Cancelled") {
+    sendResponse(res, 200, true, null, null, "Order is already cancelled");
+    return;
+  }
+
+  order.status = status;
+  await order.save();
+
+  sendResponse(res, 200, true, order, null, `Order ${status} successfully`);
+});
+
 module.exports = orderController;
