@@ -60,8 +60,7 @@ reviewController.updateReview = catchAsync(async (req, res, next) => {
 
 // Delete a review
 reviewController.deleteReview = catchAsync(async (req, res, next) => {
-  const { reviewId } = req.body;
-  const { id } = req.params;
+  const { id, reviewId } = req.params;
 
   const review = await Review.findOneAndUpdate(
     { _id: reviewId, userId: id, isDeleted: false },
