@@ -4,7 +4,8 @@ const bookController = require("../controllers/book.controller");
 const authorize = require("../middlewares/authorization");
 
 // Create a new book
-router.post("/", authorize(["admin"]), bookController.createBook);
+// router.post("/", authorize(["admin"]), bookController.createBook);
+router.post("/", bookController.createBook);
 
 // Get all books
 router.get("/", bookController.getAllBooks);

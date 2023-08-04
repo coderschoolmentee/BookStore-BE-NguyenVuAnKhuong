@@ -35,10 +35,12 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
     orderedBooks.push({ bookId, name, quantity, price, total });
   }
 
-  const totalAmount = orderedBooks.reduce(
-    (total, { total: bookTotal }) => total + bookTotal,
-    0
-  );
+  const totalAmount = orderedBooks
+    .reduce((total, { total: bookTotal }) => {
+      const bookTotalNumber = parseFloat(bookTotal);
+      return total + (isNaN(bookTotalNumber) ? 0 : bookTotalNumber);
+    }, 0)
+    .toFixed(2);
 
   const order = await Order.create({
     userId,
