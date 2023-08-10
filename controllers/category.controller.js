@@ -71,13 +71,20 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   const bookCategory = await BookCategory.find(query);
   const bookIds = bookCategory.map((item) => item.bookId);
 
-  let bookQuery = {
+  let searchQuery = {
     _id: { $in: bookIds },
     isDeleted: false,
   };
 
+  let searchRegex;
   if (search) {
-    bookQuery.name = { $regex: new RegExp(search, "i") };
+    searchRegex = new RegExp(search, "i");
+    searchQuery.$or = [
+      { name: { $regex: searchRegex } },
+      { categories: { $regex: searchRegex } },
+      { author: { $regex: searchRegex } },
+      { description: { $regex: searchRegex } },
+    ];
   }
 
   if (priceSearch) {
@@ -86,12 +93,12 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
     searchQuery.price = { $gte: minPrice, $lte: maxPrice };
   }
 
-  const totalBooks = await Book.countDocuments(bookQuery);
+  const totalBooks = await Book.countDocuments(searchQuery);
   const totalPages = Math.ceil(totalBooks / limit);
 
   const skipItems = (page - 1) * limit;
 
-  const books = await Book.find(bookQuery)
+  const books = await Book.find(searchQuery)
     .skip(skipItems)
     .limit(limit)
     .select("-isDeleted");
