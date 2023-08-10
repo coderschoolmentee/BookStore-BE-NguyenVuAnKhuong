@@ -20,7 +20,7 @@ bookController.createBook = catchAsync(async (req, res, next) => {
 });
 
 bookController.getAllBooks = catchAsync(async (req, res, next) => {
-  const { page = 1, limit = 10, search } = req.query;
+  const { page = 1, limit = 10, search, priceSearch } = req.query;
 
   const pageNumber = parseInt(page);
   const limitNumber = parseInt(limit);
@@ -35,6 +35,8 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
     searchQuery.$or = [
       { name: { $regex: new RegExp(search, "i") } },
       { categories: { $regex: new RegExp(search, "i") } },
+      { author: { $regex: new RegExp(search, "i") } },
+      { price: parseFloat(priceSearch) },
     ];
   }
 
