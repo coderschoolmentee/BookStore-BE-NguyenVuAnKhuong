@@ -39,7 +39,11 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
       { price: parseFloat(priceSearch) },
     ];
   }
-
+  if (priceSearch) {
+    const minPrice = parseFloat(priceSearch) - 0.01;
+    const maxPrice = parseFloat(priceSearch) + 0.01;
+    searchQuery.price = { $gte: minPrice, $lte: maxPrice };
+  }
   const result = await Book.aggregate([
     {
       $match: searchQuery,
