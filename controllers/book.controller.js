@@ -6,7 +6,7 @@ const bookController = {};
 
 // Create a new book
 bookController.createBook = catchAsync(async (req, res, next) => {
-  const { name, author, price, publicationDate, img } = req.body;
+  const { name, author, price, publicationDate, img, description } = req.body;
 
   const book = await Book.create({
     name,
@@ -14,6 +14,7 @@ bookController.createBook = catchAsync(async (req, res, next) => {
     price,
     publicationDate,
     img,
+    description,
   });
 
   sendResponse(res, 201, true, book, null, "Book created successfully");
@@ -36,7 +37,7 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
       { name: { $regex: new RegExp(search, "i") } },
       { categories: { $regex: new RegExp(search, "i") } },
       { author: { $regex: new RegExp(search, "i") } },
-      { price: parseFloat(priceSearch) },
+      { description: { $regex: searchRegex } },
     ];
   }
   if (priceSearch) {
@@ -44,6 +45,7 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
     const maxPrice = parseFloat(priceSearch) + 0.01;
     searchQuery.price = { $gte: minPrice, $lte: maxPrice };
   }
+
   const result = await Book.aggregate([
     {
       $match: searchQuery,
@@ -86,6 +88,7 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
         price: 1,
         publicationDate: 1,
         img: 1,
+        description: 1,
         categories: "$categories.categoryName",
       },
     },
