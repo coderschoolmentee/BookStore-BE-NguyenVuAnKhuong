@@ -58,7 +58,7 @@ categoryController.getAllCategories = catchAsync(async (req, res, next) => {
 
 categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { page = 1, limit = 5, search = "", priceSearch } = req.query;
+  const { page = 1, limit = 9, search = "", priceSearch } = req.query;
 
   const category = await Category.findOne({ _id: id, isDeleted: false });
 
@@ -81,9 +81,9 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   }
 
   if (priceSearch) {
-    const minPrice = parseFloat(priceSearch);
-    const maxPrice = minPrice + 20; // Adjust this range as needed
-    bookQuery.price = { $gte: minPrice, $lte: maxPrice };
+    const minPrice = parseFloat(priceSearch) - 0.01;
+    const maxPrice = parseFloat(priceSearch) + 0.01;
+    searchQuery.price = { $gte: minPrice, $lte: maxPrice };
   }
 
   const totalBooks = await Book.countDocuments(bookQuery);
