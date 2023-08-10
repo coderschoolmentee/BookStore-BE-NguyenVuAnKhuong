@@ -81,8 +81,8 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
   }
 
   if (priceSearch) {
-    const minPrice = parseFloat(priceSearch) - 0.01;
-    const maxPrice = parseFloat(priceSearch) + 0.01;
+    const minPrice = parseFloat(priceSearch);
+    const maxPrice = minPrice + 20; // Adjust this range as needed
     bookQuery.price = { $gte: minPrice, $lte: maxPrice };
   }
 
