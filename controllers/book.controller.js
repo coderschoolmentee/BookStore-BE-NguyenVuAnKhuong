@@ -160,6 +160,7 @@ bookController.getBookById = catchAsync(async (req, res, next) => {
         author: 1,
         price: 1,
         publicationDate: 1,
+        description: 1,
         img: 1,
         categories: "$categories.categoryName",
       },
