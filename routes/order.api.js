@@ -20,6 +20,19 @@ router.put("/:userId/:orderId", orderController.updateOrder);
 // Update Order for Admin
 router.put("/:orderId", orderController.updateOrderAD);
 
+// create a new order paypal
+router.post("/create-paypal-order", async (req, res) => {
+  const order = await orderController.createOrder();
+  res.json(order);
+});
+
+// capture payment & store order information or fullfill order
+router.post("/capture-paypal-order", async (req, res) => {
+  const { orderID } = req.body;
+  const captureData = await orderController.capturePayment(orderID);
+  res.json(captureData);
+});
+
 //Delete a order
 router.delete("/:userId/:orderId", orderController.deleteOrder);
 
