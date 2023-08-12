@@ -7,7 +7,7 @@ const orderController = {};
 
 orderController.createOrder = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  const { books, shippingAddress } = req.body;
+  const { books, shippingAddress, paymentMethods } = req.body;
 
   const user = await User.findById(userId);
 
@@ -46,6 +46,7 @@ orderController.createOrder = catchAsync(async (req, res, next) => {
     userId,
     books: orderedBooks,
     status: "Processing",
+    paymentMethods,
     totalAmount,
     shippingAddress,
   });

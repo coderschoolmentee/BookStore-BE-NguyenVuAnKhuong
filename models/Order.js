@@ -45,6 +45,11 @@ const orderSchema = new Schema(
       type: String,
       required: true,
     },
+    paymentMethods: {
+      type: String,
+      enum: ["After recieve", "PayPal"],
+      required: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
