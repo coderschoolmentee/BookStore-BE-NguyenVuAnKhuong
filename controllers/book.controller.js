@@ -37,7 +37,7 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
       { name: { $regex: new RegExp(search, "i") } },
       { categories: { $regex: new RegExp(search, "i") } },
       { author: { $regex: new RegExp(search, "i") } },
-      { description: { $regex: searchRegex } },
+      { description: { $regex: new RegExp(search, "i") } },
     ];
   }
   if (priceSearch) {
