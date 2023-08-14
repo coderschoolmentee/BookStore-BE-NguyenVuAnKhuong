@@ -38,6 +38,54 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
       { categories: { $regex: new RegExp(search, "i") } },
       { author: { $regex: new RegExp(search, "i") } },
       { description: { $regex: new RegExp(search, "i") } },
+      { publicationDate: { $regex: new RegExp(search, "i") } },
+      {
+        $expr: {
+          $or: [
+            {
+              $regexMatch: {
+                input: "$publicationDate",
+                regex: new RegExp(search, "i"),
+              },
+            },
+            {
+              $regexMatch: {
+                input: {
+                  $dateToString: {
+                    format: "%Y-%m-%d",
+                    date: "$publicationDate",
+                  },
+                },
+                regex: new RegExp(search, "i"),
+              },
+            },
+            {
+              $regexMatch: {
+                input: {
+                  $dateToString: { format: "%Y-%m", date: "$publicationDate" },
+                },
+                regex: new RegExp(search, "i"),
+              },
+            }, // Year-Month format
+            {
+              $regexMatch: {
+                input: {
+                  $dateToString: { format: "%Y", date: "$publicationDate" },
+                },
+                regex: new RegExp(search, "i"),
+              },
+            }, // Year format
+            {
+              $regexMatch: {
+                input: {
+                  $dateToString: { format: "%m-%d", date: "$publicationDate" },
+                },
+                regex: new RegExp(search, "i"),
+              },
+            }, // Month-Day format
+          ],
+        },
+      },
     ];
   }
 
