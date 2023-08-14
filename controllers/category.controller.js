@@ -76,15 +76,22 @@ categoryController.getCategoryById = catchAsync(async (req, res, next) => {
     isDeleted: false,
   };
 
-  let searchRegex;
   if (search) {
-    searchRegex = new RegExp(search, "i");
-    searchQuery.$or = [
-      { name: { $regex: searchRegex } },
-      { categories: { $regex: searchRegex } },
-      { author: { $regex: searchRegex } },
-      { description: { $regex: searchRegex } },
-    ];
+    const yearPattern = /\b\d{4}\b/;
+    const yearMatch = search.match(yearPattern);
+
+    if (yearMatch) {
+      searchQuery.publicationDate = {
+        $regex: new RegExp(`\\b${yearMatch[0]}\\b`),
+      };
+    } else {
+      searchQuery.$or = [
+        { name: { $regex: new RegExp(search, "i") } },
+        { categories: { $regex: new RegExp(search, "i") } },
+        { author: { $regex: new RegExp(search, "i") } },
+        { publicationDate: { $regex: new RegExp(search, "i") } },
+      ];
+    }
   }
 
   if (minPrice && maxPrice) {
