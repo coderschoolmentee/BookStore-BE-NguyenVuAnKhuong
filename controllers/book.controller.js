@@ -33,12 +33,24 @@ bookController.getAllBooks = catchAsync(async (req, res, next) => {
   };
 
   if (search) {
-    searchQuery.$or = [
-      { name: { $regex: new RegExp(search, "i") } },
-      { categories: { $regex: new RegExp(search, "i") } },
-      { author: { $regex: new RegExp(search, "i") } },
-      { description: { $regex: new RegExp(search, "i") } },
-    ];
+    const yearPattern = /\b\d{4}\b/; // Regular expression to match a 4-digit year
+    const yearMatch = search.match(yearPattern);
+
+    if (yearMatch) {
+      // Extracted year from search
+      searchQuery.publicationDate = {
+        $regex: new RegExp(`\\b${yearMatch[0]}\\b`),
+      };
+    } else {
+      // If no year pattern found, search other fields
+      searchQuery.$or = [
+        { name: { $regex: new RegExp(search, "i") } },
+        { categories: { $regex: new RegExp(search, "i") } },
+        { author: { $regex: new RegExp(search, "i") } },
+        { description: { $regex: new RegExp(search, "i") } },
+        { publicationDate: { $regex: new RegExp(search, "i") } },
+      ];
+    }
   }
 
   if (minPrice && maxPrice) {
